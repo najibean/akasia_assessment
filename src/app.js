@@ -6,12 +6,18 @@ const helmet = require('helmet')
 const bodyParser = require('body-parser')
 require('dotenv').config()
 const dbConnection = require('./configs/database')
+const responseHandler = require('./helpers/responseHandler')
+const ApiError = require('./helpers/errorHandler')
+const tables = require('./models/index')
+const route = require('./routers/index')
 
 class Application {
 	constructor() {
 		this.app = express()
 		this.port = process.env.PORT || 5050
 		this.plugins()
+		this.routers()
+		this.tables = tables()
 		this.start()
 	}
 
@@ -22,6 +28,23 @@ class Application {
 		this.app.use(helmet())
 		this.app.use(morgan('dev'))
 		this.app.use(compression())
+	}
+
+	routers() {
+		this.app.get('/test', (req, res, next) => {
+			responseHandler.success(res, 'Test route')
+		})
+
+		this.app.use('/', route)
+
+		this.app.use((req, res, next) => {
+			next(ApiError.notFound('Page not found!'))
+		})
+
+		this.app.use((error, req, res, next) => {
+			console.error('Error:', error.message)
+			return res.status(error.status || error.code || 500).send(error)
+		})
 	}
 
 	start() {
