@@ -9,6 +9,6 @@ router.get('/test', (req, res, next) => {
 })
 
 router.post('/generate/uvc', VoucherController.create)
-router.patch('/generate/uvc/:voucher_id', VoucherController.create)
+router.patch('/generate/uvc/:voucher_id', VoucherController.update)
 
 module.exports = router

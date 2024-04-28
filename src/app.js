@@ -45,7 +45,7 @@ class Application {
 		this.app.use((error, req, res, next) => {
 			console.error('Error:', error.message)
 
-			if (error.name.includes('Sequelize')) {
+			if (error.name && error.name.includes('Sequelize')) {
 				const errorsForSequelize = sequelizeErrorHandler(error)
 				return res
 					.status(422)
