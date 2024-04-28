@@ -10,6 +10,7 @@ const responseHandler = require('./helpers/responseHandler')
 const ApiError = require('./helpers/errorHandler')
 const tables = require('./models/index')
 const route = require('./routers/index')
+const { sequelizeErrorHandler } = require('./helpers/sequelizeErrorHandler')
 
 class Application {
 	constructor() {
@@ -43,6 +44,19 @@ class Application {
 
 		this.app.use((error, req, res, next) => {
 			console.error('Error:', error.message)
+
+			if (error.name.includes('Sequelize')) {
+				const errorsForSequelize = sequelizeErrorHandler(error)
+				return res
+					.status(422)
+					.send(
+						ApiError.unprocessableEntity(
+							'Please check your input',
+							errorsForSequelize
+						)
+					)
+			}
+
 			return res.status(error.status || error.code || 500).send(error)
 		})
 	}

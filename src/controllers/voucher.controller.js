@@ -9,7 +9,7 @@ class VoucherController {
 		try {
 			const { name, start_date, end_date, amount, num_generations } = req.body
 
-			await sequelize.sync({ force: true })
+			await sequelize.sync({ alter: true })
 
 			vouchers().hasMany(uvc())
 
